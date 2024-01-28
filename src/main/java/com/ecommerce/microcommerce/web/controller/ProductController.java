@@ -17,9 +17,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ecommerce.microcommerce.model.Product;
 import com.ecommerce.microcommerce.web.dao.ProductDao;
+import com.ecommerce.microcommerce.web.exceptions.ProduitIntrouvableException;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+
+import jakarta.validation.Valid;
 
 // @RestController = @Controller + @ResponseBody 
 // cette annotation indique que cette classe va pouvoir traiter les requêtes définies
@@ -47,7 +50,9 @@ public class ProductController {
 
     @GetMapping(value = "/Produits/{id}")
     public Product afficherUnProduit(@PathVariable int id) {
-	return productDao.findById(id);
+	Product produit = productDao.findById(id);
+	if(produit==null) throw new ProduitIntrouvableException("Le produit avec l'id " + id + " est INTROUVABLE. Écran Bleu si je pouvais.");
+	return produit;
     }
 
     @GetMapping(value = "/test/produits/{prixLimit}")
@@ -57,7 +62,7 @@ public class ProductController {
     
 
     @PostMapping(value = "/Produits")
-    public ResponseEntity<Product> ajouterProduit(@RequestBody Product product) {
+    public ResponseEntity<Product> ajouterProduit(@Valid @RequestBody Product product) {
 	Product productAdded = productDao.save(product);
 	if (Objects.isNull(productAdded)) {
 	    return ResponseEntity.noContent().build();

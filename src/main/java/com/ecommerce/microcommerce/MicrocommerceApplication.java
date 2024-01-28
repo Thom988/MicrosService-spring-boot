@@ -5,8 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
 
-// @SpringBootApplication = @Configuration + @EnableAutoConfiguration + @ComponentScan
 
+
+
+
+// @SpringBootApplication = @Configuration + @EnableAutoConfiguration + @ComponentScan
 @SpringBootApplication
 public class MicrocommerceApplication {
 

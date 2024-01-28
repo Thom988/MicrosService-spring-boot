@@ -2,8 +2,11 @@ package com.ecommerce.microcommerce.model;
 
 
 
+import org.hibernate.validator.constraints.Length;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Min;
 
 
 //@JsonFilter("monFiltreDynamique")
@@ -12,7 +15,9 @@ public class Product {
 
     @Id
     private int id;
+    @Length(min = 3, max = 25)
     private String nom;
+    @Min(value = 1)
     private int prix;
 
     // information que nous ne souhaitons pas exposer
