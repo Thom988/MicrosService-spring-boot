@@ -1,6 +1,7 @@
 package com.ecommerce.microcommerce.web.controller;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ecommerce.microcommerce.model.Product;
 import com.ecommerce.microcommerce.web.dao.ProductDao;
+import com.ecommerce.microcommerce.web.exceptions.PrixProduitEqualZeroException;
 import com.ecommerce.microcommerce.web.exceptions.ProduitIntrouvableException;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -47,6 +49,22 @@ public class ProductController {
 	produitsFiltres.setFilters(listDeNosFiltres);
 	return produitsFiltres;
     }
+    
+    @GetMapping(value = "/AdminProduits")
+    public HashMap<Product, Integer> calculerMargeProduit() {
+	List<Product> produits = productDao.findAll();
+	HashMap<Product,Integer> hashMap = new HashMap<>();
+	for (Product product : produits) {
+	    hashMap.put(product, product.getPrix()-product.getPrixAchat());
+	}
+	return hashMap;
+    }
+    
+    @GetMapping(value="/TriProduits")
+    public List<Product> trierProduitsParOrdreAlphabetique() {
+	List<Product> produits = productDao.findAllByOrderByNom();
+	return produits;
+    }
 
     @GetMapping(value = "/Produits/{id}")
     public Product afficherUnProduit(@PathVariable int id) {
@@ -62,7 +80,8 @@ public class ProductController {
     
 
     @PostMapping(value = "/Produits")
-    public ResponseEntity<Product> ajouterProduit(@Valid @RequestBody Product product) {
+    public ResponseEntity<Product> ajouterProduit(@Valid @RequestBody Product product) throws PrixProduitEqualZeroException {
+	if (product.getPrix() == 0) throw new PrixProduitEqualZeroException("Le produit avec l'id : " + product.getId() + "ne peut pas être enregistré car son prix vaut 0");
 	Product productAdded = productDao.save(product);
 	if (Objects.isNull(productAdded)) {
 	    return ResponseEntity.noContent().build();
@@ -82,6 +101,8 @@ public class ProductController {
     {
        productDao.save(product);
     }
+    
+    
     
 
 }
